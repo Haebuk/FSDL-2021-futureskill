@@ -1,3 +1,7 @@
+from six.moves import urllib
+opener = urllib.request.build_opener()
+opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+urllib.request.install_opener(opener)
 """Utility functions for text_recognizer module."""
 from concurrent.futures import as_completed, ThreadPoolExecutor
 from pathlib import Path
