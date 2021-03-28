@@ -1,42 +1,42 @@
-# Lab 2: Convolutional Neural Nets and Synthetic Lines
+# Lab 2: 합성곱 신경망
 
-## Goal of the lab
+## 이번 랩의 목표
 
-We're working up to translating images of handwriting to text.
-In this lab, we're going to
+손글씨 이미지를 텍스트로 변환하는 작업을 하고 있습니다.
 
-- Use a simple convolutional network to recognize EMNIST characters.
-- Construct a synthetic dataset of EMNIST lines.
+이번 랩에서는, 다음 내용을 다룹니다.
 
-## Before you begin, make sure to set up!
+- 간단한 합성곱 신경망을 이용하여 EMNIST 글자를 인식합니다.
+- EMNIST 라인(줄)에 대한 데이터셋을 구축합니다.
 
-Please complete [Lab Setup](/setup/readme.md) before proceeding!
+## 시작하기전 반드시 세팅을 해주세요!
 
-Then, in the `fsdl-text-recognizer-2021-labs` repo, let's pull the latest changes, and enter the correct directory.
+실행 전, [Lab Setup](/setup/readme.md)을 완료해주시기 바랍니다.
+
+그 후, `fsdl-text-recognizer-2021-labs` 레퍼지토리에서 최근 작업물을 pull한 다음, 아래와 같이 작업공간으로 이동하면 됩니다.
 
 ```
 git pull
 cd lab2
 ```
 
-## Intro to EMNIST
+## EMNIST란?
 
-MNIST stands for Mini-NIST, where NIST is the National Institute of Standards and Technology, which compiled a dataset of handwritten digits and letters in the 1980s.
+MIST는 Mini-NIST를 의미합니다. 여기서 NIST란 1980년대에 손으로 쓴 숫자와 글자의 데이터 셋을 작성한 'National Institute of Standards and Technology'의 약자입니다. 
 
-MNIST is Mini because it only included digits.
+MNIST는 이 중 숫자만 포함하기 때문에 'Mini'입니다.
 
-EMNIST is a repackaging of the original dataset, which also includes letters, but presented in the popularized MNIST format.
-You can see a publication about it here https://www.paperswithcode.com/paper/emnist-an-extension-of-mnist-to-handwritten
+EMNIST는 문자를 포함하지만, 널리 알려진 MNIST 형식으로 제공되는 원본 데이터 셋의 재포장된 형태입니다.
+[링크](https://www.paperswithcode.com/paper/emnist-an-extension-of-mnist-to-handwritten)를 통해 더 자세한 설명을 살펴 볼 수 있습니다.
 
-We can take a look at the data in `notebooks/01-look-at-emnist.ipynb`.
+`notebooks/01-look-at-emnist.ipynb`에서 데이터를 살펴보겠습니다.
 
-(Note that we now have a new directory in `lab2`: `notebooks`. While we don't do training of our models in notebooks, we use them for exploring the data, and perhaps presenting the results of our model training.)
+(`lab2`: `notebooks` 작업 경로에 유의하시기 바랍니다. 이 노트북에서 모델을 실행하지는 않지만, 모델을 통해 데이터를 탐색하고, 모델 훈련의 결과는 확인합니다.)
 
-### Brief aside: data directory structure
+### 요약: 데이터 작업경로 구조
 
 
-You may have noticed that both MNIST and EMNIST download data from the Internet before training.
-Where is this data stored?
+MNIST와 EMNIST 데이터를 인터넷으로부터 다운로드했습니다. 저장 경로는 어디일까요?
 
 ```
 (fsdl-text-recognizer-2021) ➜  lab2 git:(main) ✗ tree -I "lab*|__pycache__" ..
@@ -54,7 +54,7 @@ Where is this data stored?
 └── setup
 ```
 
-We specify the EMNIST dataset with `metadata.toml` and `readme.md` which contain information on how it should be downloaded and its provenance.
+EMNIST 데이터 셋을 다운로드해야 하는 방법과 그 출처에 대한 정보가 포함된 `metadata.toml` 및 `readme.md`으로 나타냅니다.
 
 ## Using a convolutional network for recognizing MNIST
 
