@@ -29,7 +29,7 @@ MNIST는 이 중 숫자만 포함하기 때문에 'Mini'입니다.
 EMNIST는 문자를 포함하지만, 널리 알려진 MNIST 형식으로 제공되는 원본 데이터 셋의 재포장된 형태입니다.
 [링크](https://www.paperswithcode.com/paper/emnist-an-extension-of-mnist-to-handwritten)를 통해 더 자세한 설명을 살펴 볼 수 있습니다.
 
-`notebooks/01-look-at-emnist.ipynb`에서 데이터를 살펴보겠습니다.
+`notebooks/01-look-at-emnist.ipynb`에서 데이터를 살펴보겠습니다. [링크](https://github.com/Haebuk/FSDL-2021-futureskill/blob/main/lab2/notebooks/01-look-at-emnist.ipynb)
 
 (`lab2`: `notebooks` 작업 경로에 유의하시기 바랍니다. 이 노트북에서 모델을 실행하지는 않지만, 모델을 통해 데이터를 탐색하고, 모델 훈련의 결과는 확인합니다.)
 
@@ -56,69 +56,66 @@ MNIST와 EMNIST 데이터를 인터넷으로부터 다운로드했습니다. 저
 
 EMNIST 데이터 셋을 다운로드해야 하는 방법과 그 출처에 대한 정보가 포함된 `metadata.toml` 및 `readme.md`으로 나타냅니다.
 
-## Using a convolutional network for recognizing MNIST
+## MNIST를 인식하기 위한 합성곱 신경망 사용
 
-We left off in Lab 1 having trained an MLP model on the MNIST digits dataset.
+Lab1에서 MNIST 숫자 데이터 셋에 대한 MLP 모델을 적합한 후 끝냈습니다.
 
-We can now train a CNN for the same purpose:
+이제 똑같은 목적으로 CNN을 학습하겠습니다:
 
 ```sh
 python3 training/run_experiment.py --model_class=CNN --data_class=MNIST --max_epochs=5 --gpus=1
 ```
 
-## Doing the same for EMNIST
+## EMNIST도 동일하게 진행!
 
-We can do the same on the larger EMNIST dataset:
+더 커진 EMNIST 데이터셋으로 동일하게 진행합니다:
 
 ```sh
 python3 training/run_experiment.py --model_class=CNN --data_class=EMNIST --max_epochs=5 --gpus=1
 ```
 
-Training the single epoch will take about 2 minutes (that's why we only do one epoch in this lab :)).
-Leave it running while we go on to the next part.
+한 epoch당 훈련에 약 2분정도의 시간이 소요 됩니다. 실행되는 동안 다음 파트로 넘어가겠습니다.
 
-## Intentional overfitting
+## 의도적인 과적합
 
-It is very useful to be able to subsample the dataset for quick experiments and to make sure that the model is robust enough to represent the data (more on this in the Training & Debugging lecture).
+데이터 셋의 표본을 사용하는 것이 빠른 실행에도 도움이 되며, 모델을 나타내는 데에도 도움이 됩니다. (Training & Debug 강의에서 자세히 다룰 예정).
 
-This is possible by passing `--overfit_batches=0.01` (or some other fraction).
-You can also provide an int `> 1` instead for a concrete number of batches.
-https://pytorch-lightning.readthedocs.io/en/stable/debugging.html#make-model-overfit-on-subset-of-data
+다음과 같은 문구를 추가하여 적용할 수 있습니다. `--overfit_batches=0.01` (0과 1사이의 소수).
+
+또한 `> 1`보다 큰 정수를 사용하여 특정 배치 수를 선택할 수 있습니다. `overfit_batches=2`는 2 개의 배치를 의미합니다.
+[pytorch-lightning](https://pytorch-lightning.readthedocs.io/en/stable/debugging.html#make-model-overfit-on-subset-of-data) 참고
 
 ```sh
 python3 training/run_experiment.py --model_class=CNN --data_class=EMNIST --max_epochs=50 --gpus=1 --overfit_batches=2
 ```
 
-## Speeding up training
+## 훈련 속도 증가
 
-One way we can make sure that our GPU stays consistently highly utilized is to do data pre-processing in separate worker processes, using the `--num_workers=X` flag.
+GPU가 지속적으로 높은 활용도를 유지하도록 하는 한 가지 방법은 '--num_workers=X' 플래그를 사용하여 별도의 작업자 프로세스에서 데이터 사전 처리를 수행하는 것입니다.
 
 ```sh
 python3 training/run_experiment.py --model_class=CNN --data_class=EMNIST --max_epochs=5 --gpus=1 --num_workers=4
 ```
 
-## Making a synthetic dataset of EMNIST Lines
+## EMNIST을 이용한 인공 데이터 생성
 
-- Synthetic dataset we built for this project
-- Sample sentences from Brown corpus
-- For each character, sample random EMNIST character and place on a line (optionally, with some random overlap)
-- Look at: `notebooks/02-look-at-emnist-lines.ipynb`
+- 프로젝트를 위한 EMNIST 인공 데이터를 생성합니다.
+- Browm 코퍼스(말뭉치)에서 표본 문장들을 인용했습니다.
+- 각 글자들은 EMNIST에서 랜덤으로 추출되고 한 줄로 정렬됩니다. (중복이 될 수도 있습니다.)
+- `notebooks/02-look-at-emnist-lines.ipynb`에서 확인 가능합니다. [링크](https://github.com/Haebuk/FSDL-2021-futureskill/blob/main/lab2/notebooks/02-look-at-emnist-lines.ipynb)
 
-## Homework
+## 과제
 
-Edit the `CNN` and `ConvBlock` architecture in `text_recognizers/models/cnn.py` in some ways.
+`text_recognizers/models/cnn.py` 안에 있는 `CNN` 과 `ConvBlock` 구조를 자유롭게 수정하세요.   
 
-In particular, edit the `ConvBlock` module to be more like a ResNet block, as shown in the following image:
+특히 `ConvBlock` 모듈은 아래의 ResNet 블록 처럼 만들어 보세요!
 
 ![](./resblock.png)
 
-Some other things to try:
+추가로 도전해 볼 것:
 
-- Try adding more of the ResNet secret sauce, such as `BatchNorm`. Take a look at the official ResNet PyTorch implementation for ideas: https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
-- Remove `MaxPool2D`, perhaps using a strided convolution instead.
-- Add some command-line arguments to make trying things a quicker process.
-- A good argument to add would be for the number of `ConvBlock`s to run the input through.
+- ResNet에 `BatchNorm`을 추가해보세요. 해당 정보는 공식 [ResNet PyTorch 설명](https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py)에서 얻을 수 있습니다.
+- `MaxPool2D`를 삭제하고, 대신 스트라이드를 사용해보세요.
+- 더 빠른 실행을 위해 커맨드라인 인수를 추가해보세요.
+- 예를 들어 `ConvBlock` 블록 수를 조정하는 인수를 추가하면 실행 속도에 영향을 줄 수 있습니다.
 
-Explain what you did, paste the contents of `cnn.py`, and paste your training output into the last question of Gradescope Assignment 2.
-
-As long as you tried a couple of things, you will receive full credit.
